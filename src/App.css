@@ -1,0 +1,130 @@
+/* Light theme buttons */
+.button {
+  padding: 6px 12px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  background-color: #e0e0e0;
+  color: #000;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.button:hover {
+  background-color: #c8c8c8;
+}
+
+/* Dark theme buttons */
+.dark .button {
+  background-color: #3a3a3a;
+  color: #eee;
+}
+
+.dark .button:hover {
+  background-color: #555;
+}
+
+
+/* Dark mode overrides for Swagger UI */
+/* .dark .swagger-ui {
+  --color-primary: #61dafb;
+  --color-primary-dark: #21a1f1;
+  --color-primary-light: #85d7ff;
+
+  --text-primary-color: #e0e0e0;
+  --text-secondary-color: #bbbbbb;
+  --bg-color: #1e1e1e;
+  --bg-secondary-color: #2a2a2a;
+  --border-color: #444;
+
+  background-color: var(--bg-color);
+  color: var(--text-primary-color);
+} */
+
+/* .dark .swagger-ui .scheme-container, */
+/* .dark .swagger-ui .info, */
+/* .dark .swagger-ui .opblock,
+.dark .swagger-ui .responses-wrapper,
+.dark .swagger-ui .response-col_description__inner {
+  background-color: var(--bg-secondary-color);
+  color: var(--text-primary-color); 
+  border-color: var(--border-color);
+} */
+
+/* .dark .swagger-ui .scheme-container {
+  background-color: #1e1e1e;
+} */
+
+/* .dark .swagger-ui .opblock-summary-method {
+  background-color: #3a3a3a !important;
+  color: #61dafb !important;
+} */
+/* 
+.dark .swagger-ui a {
+  color: #61dafb;
+} */
+
+/* .dark .swagger-ui .opblock-description-wrapper pre,
+.dark .swagger-ui .response-col_description pre {
+  background-color: #2a2a2a;
+  color: #ccc;
+} */
+
+/* Scrollbar for Swagger UI */
+/* .dark .swagger-ui ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark .swagger-ui ::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 4px;
+}
+
+.dark .swagger-ui ::-webkit-scrollbar-track {
+  background-color: #1e1e1e;
+} */
+
+/* .dark .swagger-ui .info .title {
+    color: #f2f2f2;
+} */
+
+/* .dark .swagger-ui button {
+  fill: white;
+} */
+/* .dark .swagger-ui .expand-methods svg, .dark .swagger-ui .expand-operation svg {
+    fill: white;
+} */
+
+
+
+
+
+/* Split pane styles */
+.split {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.split > * {
+  overflow: auto;
+}
+
+.split .gutter {
+  background-color: #ccc;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.split .gutter.gutter-horizontal {
+  cursor: col-resize;
+  width: 6px;
+}
+
+.dark .split .gutter {
+  background-color: #444;
+}
