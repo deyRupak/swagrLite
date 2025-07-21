@@ -33,6 +33,13 @@ export const handleFileDrop = (
 export const downloadSpec = (spec: string, format: "yaml" | "json") => {
   try {
     const doc = yaml.parse(spec);
+    const title = doc?.info?.title
+      ? doc.info.title
+          .toString()
+          .replace(/[^\w\s-]/g, "") // remove special chars
+          .trim()
+          .replace(/\s+/g, "-") // spaces to dashes
+      : "openapi-spec";
     const content =
       format === "json" ? JSON.stringify(doc, null, 2) : yaml.stringify(doc);
     const blob = new Blob([content], { type: "text/plain" });
@@ -40,7 +47,7 @@ export const downloadSpec = (spec: string, format: "yaml" | "json") => {
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = `openapi-spec.${format}`;
+    a.download = `${title}.${format}`;
     a.click();
     URL.revokeObjectURL(url);
   } catch (err: any) {
