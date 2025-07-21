@@ -2,11 +2,19 @@ interface HeaderProps {
   spec: string;
   downloadSpec: (spec: string, format: "yaml" | "json") => void;
   importFromUrl: () => void;
+  importFromFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleTheme: () => void;
   theme: "light" | "dark";
 }
 
-const Header: React.FC<HeaderProps> = ({ spec, downloadSpec, importFromUrl, toggleTheme, theme }) => {
+const Header: React.FC<HeaderProps> = ({
+  spec,
+  downloadSpec,
+  importFromUrl,
+  importFromFile,
+  toggleTheme,
+  theme,
+}) => {
   return (
     <div
       style={{
@@ -21,26 +29,45 @@ const Header: React.FC<HeaderProps> = ({ spec, downloadSpec, importFromUrl, togg
       <div>
         <button
           className="button"
-          onClick={() => downloadSpec(spec, 'yaml')}
+          onClick={() => downloadSpec(spec, "yaml")}
           style={{ marginRight: 8 }}
         >
           Download YAML
         </button>
         <button
           className="button"
-          onClick={() => downloadSpec(spec, 'json')}
+          onClick={() => downloadSpec(spec, "json")}
           style={{ marginRight: 8 }}
         >
           Download JSON
         </button>
-        <button className="button" onClick={importFromUrl} style={{ marginRight: 8 }}>
+
+        <button
+          className="button"
+          onClick={importFromUrl}
+          style={{ marginRight: 8 }}
+        >
           Import from URL
         </button>
-        <button className="button" onClick={toggleTheme}>
+        <input
+          type="file"
+          accept=".yaml,.yml,.json"
+          style={{ display: "none" }}
+          id="fileInput"
+          onChange={importFromFile}
+        />
+        <label htmlFor="fileInput" className="button">
+          Import File
+        </label>
+
+        <button className="button" style={{ marginLeft: "2rem" }} onClick={toggleTheme}>
           Toggle {theme === "dark" ? "Light" : "Dark"} Mode
         </button>
       </div>
-      <p style={{ fontSize: "1.2rem", fontWeight: "bolder", color: '#38d120' }}>{"{"} SwagrLite {"}"}</p>
+
+      <p style={{ fontSize: "1.2rem", fontWeight: "bolder", color: "#38d120" }}>
+        {"{"} SwagrLite {"}"}
+      </p>
     </div>
   );
 };

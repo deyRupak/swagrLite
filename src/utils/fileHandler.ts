@@ -1,4 +1,4 @@
-import yaml from 'yaml';
+import yaml from "yaml";
 
 // Handle file drop to parse YAML or JSON
 export const handleFileDrop = (
@@ -49,7 +49,9 @@ export const downloadSpec = (spec: string, format: "yaml" | "json") => {
 };
 
 // Import spec from URL (YAML or JSON)
-export const importFromUrl = async (setSpec: React.Dispatch<React.SetStateAction<string>>) => {
+export const importFromUrl = async (
+  setSpec: React.Dispatch<React.SetStateAction<string>>
+) => {
   const url = prompt("Enter URL to import OpenAPI (YAML or JSON):");
   if (!url) return;
 
@@ -70,10 +72,30 @@ export const importFromUrl = async (setSpec: React.Dispatch<React.SetStateAction
         yaml.parse(text);
         setSpec(text);
       } catch (yamlError) {
-        alert("The provided URL content is neither a valid OpenAPI JSON nor YAML.");
+        alert(
+          "The provided URL content is neither a valid OpenAPI JSON nor YAML."
+        );
       }
     }
   } catch (err: any) {
     alert("Failed to import spec: " + err.message);
   }
+};
+
+export const importFromFile = (
+  event: React.ChangeEvent<HTMLInputElement>,
+  setSpec: (content: string) => void
+) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const content = e.target?.result;
+    if (typeof content === "string") {
+      setSpec(content);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
 };

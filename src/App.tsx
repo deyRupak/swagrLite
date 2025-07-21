@@ -12,6 +12,7 @@ import {
   handleFileDrop,
   downloadSpec,
   importFromUrl,
+  importFromFile
 } from "./utils/fileHandler";
 import { validateOpenAPI, parseDocumentForPreview } from "./utils/yamlUtils";
 import "./App.css";
@@ -139,6 +140,7 @@ const App: React.FC = () => {
           spec={spec}
           downloadSpec={downloadSpec}
           importFromUrl={() => importFromUrl(setSpec)}
+          importFromFile={(e) => importFromFile(e, setSpec)}
           toggleTheme={() =>
             setTheme((prev) => (prev === "light" ? "dark" : "light"))
           }
