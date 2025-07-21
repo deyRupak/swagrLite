@@ -26,6 +26,24 @@ export const pathsSnippet = `paths:
                 $ref: '#/components/schemas/Example'
 `;
 
+function findBlockEnd(lines: string[], startIndex: number): number {
+  const startIndent = lines[startIndex].search(/\S/);
+  let i = startIndex + 1;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (line.trim() === "") {
+      i++;
+      continue;
+    }
+    const indent = line.search(/\S/);
+    if (indent <= startIndent) {
+      break;
+    }
+    i++;
+  }
+  return i - 1;
+}
+
 // if 'paths' exists, replaces it; otherwise, inserts after 'info:' section or 'openapi:' if 'info:' not found
 export function addOrReplacePathsInSpec(currentSpec: string): string {
   const lines = currentSpec.split("\n");
@@ -39,7 +57,7 @@ export function addOrReplacePathsInSpec(currentSpec: string): string {
   );
 
   if (pathsIndex !== -1) {
-    // remove existing paths section
+    // remove existing paths block
     let endIndex = pathsIndex + 1;
     while (
       endIndex < lines.length &&
@@ -54,14 +72,18 @@ export function addOrReplacePathsInSpec(currentSpec: string): string {
     );
     return lines.join("\n");
   } else {
-    // insert paths snippet after info or openapi line
-    const insertAfterIndex = infoIndex !== -1 ? infoIndex : openapiIndex;
-    if (insertAfterIndex === -1) {
-      // no openapi or info found, prepend paths snippet
+    // insert paths snippet after end of 'info:' block, or after 'openapi:', or prepend
+    if (infoIndex !== -1) {
+      const infoEndIndex = findBlockEnd(lines, infoIndex);
+      lines.splice(infoEndIndex + 1, 0, ...pathsSnippet.split("\n"));
+      return lines.join("\n");
+    } else if (openapiIndex !== -1) {
+      lines.splice(openapiIndex + 1, 0, ...pathsSnippet.split("\n"));
+      return lines.join("\n");
+    } else {
+      // no 'info:' or 'openapi:' found, prepend the paths
       return `${pathsSnippet}\n${currentSpec}`;
     }
-    lines.splice(insertAfterIndex + 1, 0, ...pathsSnippet.split("\n"));
-    return lines.join("\n");
   }
 }
 

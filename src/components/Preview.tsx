@@ -22,23 +22,6 @@ const Preview: React.FC<PreviewProps> = ({ parsedSpec, theme }) => {
     );
   }
 
-  // Optional: check for valid OpenAPI version before rendering SwaggerUI
-  const isValidSpec = parsedSpec.openapi?.startsWith("3.");
-  if (!isValidSpec) {
-    return (
-      <div
-        style={{
-          width: "50%",
-          padding: "20px",
-          background: "#fffbe6",
-          color: "#b26a00",
-        }}
-      >
-        ⚠️ Invalid OpenAPI spec — missing or incorrect `openapi` version.
-      </div>
-    );
-  }
-
   return (
     <div
       style={{
