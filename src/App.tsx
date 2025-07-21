@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import Split from "react-split";
 import * as monaco from "monaco-editor";
@@ -6,7 +6,8 @@ import Editor from "./components/Editor";
 import Preview from "./components/Preview";
 import Header from "./components/Header";
 import ErrorDisplay from "./components/ErrorDisplay";
-import { saveToDB, loadFromDB } from "./utils/storage";
+import { saveToDB, loadFromDB } from "./schemas/indexedDb";
+import { debounce } from "./utils/debounce";
 import {
   handleFileDrop,
   downloadSpec,
@@ -19,7 +20,7 @@ type OpenApiError = { message: string; line?: number };
 
 const App: React.FC = () => {
   const [spec, setSpec] = useState<string>(
-    "openapi: 3.0.0\ninfo:\n  title: Sample API\n  version: 1.0.0\npaths: {}"
+    "# Please begin editing or drag and drop your file into this area to upload.\n\nopenapi: 3.0.0\ninfo:\n  title: Sample API\n  version: 1.0.0\npaths: {}"
   );
   const [yamlError, setYamlError] = useState<string | null>(null);
   const [openApiErrors, setOpenApiErrors] = useState<OpenApiError[]>([]);
@@ -35,30 +36,21 @@ const App: React.FC = () => {
     OPENAPI_ERRORS: "openApiErrors",
   };
 
-  // Load from IndexedDB once
   useEffect(() => {
     const loadPersistedState = async () => {
       const savedSpec = await loadFromDB(STORAGE_KEYS.SPEC);
-      const savedTheme = await loadFromDB(STORAGE_KEYS.THEME);
-      const savedErrors = await loadFromDB(STORAGE_KEYS.OPENAPI_ERRORS);
       const savedYamlError = await loadFromDB(STORAGE_KEYS.YAML_ERROR);
+      const savedErrors = await loadFromDB(STORAGE_KEYS.OPENAPI_ERRORS);
+      const savedTheme = await loadFromDB(STORAGE_KEYS.THEME);
 
       if (savedSpec) setSpec(savedSpec);
-      if (savedTheme) setTheme(savedTheme);
-      if (savedErrors) setOpenApiErrors(savedErrors);
       if (savedYamlError) setYamlError(savedYamlError);
+      if (savedErrors) setOpenApiErrors(savedErrors);
+      if (savedTheme) setTheme(savedTheme);
     };
 
     loadPersistedState();
   }, []);
-
-  // Persist to IndexedDB on changes
-  useEffect(() => {
-    saveToDB(STORAGE_KEYS.SPEC, spec);
-    saveToDB(STORAGE_KEYS.YAML_ERROR, yamlError);
-    saveToDB(STORAGE_KEYS.OPENAPI_ERRORS, openApiErrors);
-    saveToDB(STORAGE_KEYS.THEME, theme);
-  }, [spec, yamlError, openApiErrors, theme]);
 
   const jumpToLine = (line: number) => {
     const editor = editorRef.current;
@@ -68,6 +60,20 @@ const App: React.FC = () => {
       editor.focus();
     }
   };
+
+  const debouncedSave = useCallback(
+    debounce(async (spec, yamlError, openApiErrors, theme) => {
+      await saveToDB(STORAGE_KEYS.SPEC, spec);
+      await saveToDB(STORAGE_KEYS.YAML_ERROR, yamlError);
+      await saveToDB(STORAGE_KEYS.OPENAPI_ERRORS, openApiErrors);
+      await saveToDB(STORAGE_KEYS.THEME, theme);
+    }, 500),
+    []
+  );
+
+  useEffect(() => {
+    debouncedSave(spec, yamlError, openApiErrors, theme);
+  }, [spec, yamlError, openApiErrors, theme, debouncedSave]);
 
   useEffect(() => {
     if (yamlError !== null) {

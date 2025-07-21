@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ spec, downloadSpec, importFromUrl, togg
           Toggle {theme === "dark" ? "Light" : "Dark"} Mode
         </button>
       </div>
-      <p style={{ fontSize: "1.2rem", fontWeight: "bolder" }}>SwagrLite</p>
+      <p style={{ fontSize: "1.2rem", fontWeight: "bolder", color: '#38d120' }}>{"{"} SwagrLite {"}"}</p>
     </div>
   );
 };
