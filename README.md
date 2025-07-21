@@ -12,9 +12,11 @@ A lightweight Swagger Editor–like app built with **React**, **TypeScript**, an
 - ✅ **OpenAPI Schema Validation** for accurate spec compliance  
 - 🪠 **Real-time Squiggles** highlighting YAML and OpenAPI errors  
 - 🔍 **Error Panel** with clickable line numbers for quick navigation  
+- 🧭 **API Exploration** to test, learn & understand how the API works
 - 🕒 **Debounced Validation** to optimize performance while typing  
 - 📁 **File Import & Export** for managing your OpenAPI YAML files locally  
 - 📂 **Drag and Drop** support for quick file importing  
+
 
 <br>
 
