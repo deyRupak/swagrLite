@@ -98,7 +98,9 @@
     fill: white;
 } */
 
-
+.swagger-ui .parameters-col_description input {
+  color: #000;
+}
 
 
 

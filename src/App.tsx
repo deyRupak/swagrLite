@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Helmet } from "react-helmet";
 import Split from "react-split";
 import * as monaco from "monaco-editor";
 import Editor from "./components/Editor";
@@ -6,7 +7,11 @@ import Preview from "./components/Preview";
 import Header from "./components/Header";
 import ErrorDisplay from "./components/ErrorDisplay";
 import { saveToDB, loadFromDB } from "./utils/storage";
-import { handleFileDrop, downloadSpec, importFromUrl } from "./utils/fileHandler";
+import {
+  handleFileDrop,
+  downloadSpec,
+  importFromUrl,
+} from "./utils/fileHandler";
 import { validateOpenAPI, parseDocumentForPreview } from "./utils/yamlUtils";
 import "./App.css";
 
@@ -81,41 +86,96 @@ const App: React.FC = () => {
     return () => clearTimeout(timeout);
   }, [spec]);
 
-
   return (
-    <div
-      onDrop={(e) => handleFileDrop(e, setSpec)}
-      onDragOver={(e) => e.preventDefault()}
-      className={theme === "dark" ? "dark" : ""}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        width: "100vw",
-        backgroundColor: theme === "dark" ? "#121212" : "#f0f0f0",
-        color: theme === "dark" ? "#e0e0e0" : "#000000",
-        fontFamily: "Segoe UI, sans-serif",
-      }}
-    >
-      <Header spec={spec} downloadSpec={downloadSpec} importFromUrl={() => importFromUrl(setSpec)} toggleTheme={() => setTheme((prev) => (prev === "light" ? "dark" : "light"))} theme={theme} />
-      
-      <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
-        <Split className="split" sizes={[50, 50]} minSize={300} gutterSize={6} direction="horizontal">
-          <Editor
-            spec={spec}
-            setSpec={setSpec}
-            setYamlError={setYamlError}
-            yamlError={yamlError}
+    <>
+      <Helmet>
+        <title>SwagrLite - Lightweight Swagger Editor</title>
+        <meta
+          name="description"
+          content="SwagrLite: A lightweight and easy-to-use Swagger (OpenAPI) editor for designing, linting & exploring API specs."
+        />
+        <meta
+          name="keywords"
+          content="swagger editor, openapi spec, api design, openapi linting"
+        />
+        <meta name="robots" content="index, follow" />
+        {/* Open Graph meta tags */}
+        <meta
+          property="og:title"
+          content="SwagrLite - Lightweight Swagger Editor"
+        />
+        <meta
+          property="og:description"
+          content="Edit and lint OpenAPI specs quickly with SwagrLite."
+        />
+        <meta
+          property="og:url"
+          content="https://deyrupak.github.io/swagrLite/"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
+
+      <div
+        onDrop={(e) => handleFileDrop(e, setSpec)}
+        onDragOver={(e) => e.preventDefault()}
+        className={theme === "dark" ? "dark" : ""}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+          width: "100vw",
+          backgroundColor: theme === "dark" ? "#121212" : "#f0f0f0",
+          color: theme === "dark" ? "#e0e0e0" : "#000000",
+          fontFamily: "Segoe UI, sans-serif",
+        }}
+      >
+        <Header
+          spec={spec}
+          downloadSpec={downloadSpec}
+          importFromUrl={() => importFromUrl(setSpec)}
+          toggleTheme={() =>
+            setTheme((prev) => (prev === "light" ? "dark" : "light"))
+          }
+          theme={theme}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            width: "100%",
+          }}
+        >
+          <Split
+            className="split"
+            sizes={[50, 50]}
+            minSize={300}
+            gutterSize={6}
+            direction="horizontal"
+          >
+            <Editor
+              spec={spec}
+              setSpec={setSpec}
+              setYamlError={setYamlError}
+              yamlError={yamlError}
+              openApiErrors={openApiErrors}
+              editorRef={editorRef}
+              theme={theme}
+            />
+            {!yamlError && openApiErrors.length === 0 && (
+              <Preview parsedSpec={parsedSpec} theme={theme} />
+            )}
+          </Split>
+
+          <ErrorDisplay
             openApiErrors={openApiErrors}
-            editorRef={editorRef}
+            jumpToLine={jumpToLine}
             theme={theme}
           />
-          {!yamlError && openApiErrors.length === 0 && <Preview parsedSpec={parsedSpec} theme={theme} />}
-        </Split>
-
-        <ErrorDisplay openApiErrors={openApiErrors} jumpToLine={jumpToLine} theme={theme} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
