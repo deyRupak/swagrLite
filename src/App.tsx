@@ -14,6 +14,8 @@ import {
   importFromUrl,
   importFromFile
 } from "./utils/fileHandler";
+import { createAddInfoHandler } from "./utils/infoSnippetHandler";
+import { createAddPathsHandler } from "./utils/pathSnippetHandler";
 import { validateOpenAPI, parseDocumentForPreview } from "./utils/yamlUtils";
 import "./App.css";
 
@@ -29,6 +31,9 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+  const addInfo = React.useCallback(createAddInfoHandler(setSpec), [setSpec]);
+  const addPath = React.useCallback(createAddPathsHandler(setSpec), [setSpec]);
 
   const STORAGE_KEYS = {
     SPEC: "spec",
@@ -153,6 +158,8 @@ const App: React.FC = () => {
           downloadSpec={downloadSpec}
           importFromUrl={() => importFromUrl(setSpec)}
           importFromFile={(e) => importFromFile(e, setSpec)}
+          addInfo={addInfo}
+          addPath={addPath}
           toggleTheme={() =>
             setTheme((prev) => (prev === "light" ? "dark" : "light"))
           }

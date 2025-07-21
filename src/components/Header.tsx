@@ -3,6 +3,8 @@ interface HeaderProps {
   downloadSpec: (spec: string, format: "yaml" | "json") => void;
   importFromUrl: () => void;
   importFromFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  addInfo: () => void;
+  addPath: () => void;
   toggleTheme: () => void;
   clearEditor: () => void;
   theme: "light" | "dark";
@@ -13,6 +15,8 @@ const Header: React.FC<HeaderProps> = ({
   downloadSpec,
   importFromUrl,
   importFromFile,
+  addInfo,
+  addPath,
   toggleTheme,
   clearEditor,
   theme,
@@ -29,19 +33,21 @@ const Header: React.FC<HeaderProps> = ({
       }}
     >
       <div>
+
+        {/*  */}
         <button
           className="button"
           onClick={() => downloadSpec(spec, "yaml")}
           style={{ marginRight: 8 }}
         >
-          Download YAML
+          Download as YAML
         </button>
         <button
           className="button"
           onClick={() => downloadSpec(spec, "json")}
           style={{ marginRight: 8 }}
         >
-          Download JSON
+          Download as JSON
         </button>
 
         <button
@@ -62,12 +68,32 @@ const Header: React.FC<HeaderProps> = ({
           Import File
         </label>
 
+        {/*  */}
+        <button
+          className="button"
+          onClick={addInfo}
+          style={{ marginLeft: "2rem", backgroundColor: "#2a7ae8", color: "#fff" }}
+          title="Add Info"
+        >
+          Add Info
+        </button>
+        <button
+          className="button"
+          onClick={addPath}
+          style={{ backgroundColor: "#2a7ae8", color: "#fff" }}
+          title="Add Path Item"
+        >
+          Add Path Item
+        </button>
+
+        {/*  */}
         <button className="button" style={{ marginLeft: "2rem" }} onClick={toggleTheme}>
           Toggle {theme === "dark" ? "Light" : "Dark"} Mode
         </button>
         <button className="button" style={{ backgroundColor: "#e82a3a", color: "#fff", marginLeft: "2rem" }} onClick={clearEditor}>
           Clear Editor
         </button>
+
       </div>
 
       <p style={{ fontSize: "1.2rem", fontWeight: "bolder", color: "#38d120" }}>
