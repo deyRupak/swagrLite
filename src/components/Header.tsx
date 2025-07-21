@@ -4,6 +4,7 @@ interface HeaderProps {
   importFromUrl: () => void;
   importFromFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleTheme: () => void;
+  clearEditor: () => void;
   theme: "light" | "dark";
 }
 
@@ -13,6 +14,7 @@ const Header: React.FC<HeaderProps> = ({
   importFromUrl,
   importFromFile,
   toggleTheme,
+  clearEditor,
   theme,
 }) => {
   return (
@@ -62,6 +64,9 @@ const Header: React.FC<HeaderProps> = ({
 
         <button className="button" style={{ marginLeft: "2rem" }} onClick={toggleTheme}>
           Toggle {theme === "dark" ? "Light" : "Dark"} Mode
+        </button>
+        <button className="button" style={{ backgroundColor: "#e82a3a", color: "#fff", marginLeft: "2rem" }} onClick={clearEditor}>
+          Clear Editor
         </button>
       </div>
 

@@ -93,6 +93,18 @@ const App: React.FC = () => {
     return () => clearTimeout(timeout);
   }, [spec]);
 
+  const clearEditor = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to clear the editor? Unsaved changes will be lost."
+      )
+    ) {
+      setSpec("# Drag and drop your file into this area to upload or use any of the options above.");
+      setYamlError(null);
+      setOpenApiErrors([]);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -144,6 +156,7 @@ const App: React.FC = () => {
           toggleTheme={() =>
             setTheme((prev) => (prev === "light" ? "dark" : "light"))
           }
+          clearEditor={clearEditor}
           theme={theme}
         />
 
