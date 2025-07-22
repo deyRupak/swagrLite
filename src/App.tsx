@@ -12,7 +12,7 @@ import {
   handleFileDrop,
   downloadSpec,
   importFromUrl,
-  importFromFile
+  importFromFile,
 } from "./utils/fileHandler";
 import { createAddInfoHandler } from "./utils/infoSnippetHandler";
 import { createAddPathsHandler } from "./utils/pathSnippetHandler";
@@ -21,10 +21,22 @@ import "./App.css";
 
 type OpenApiError = { message: string; line?: number };
 
+const STORAGE_KEYS = {
+  SPEC: "spec",
+  THEME: "theme",
+  YAML_ERROR: "yamlError",
+  OPENAPI_ERRORS: "openApiErrors",
+};
+
+const DEFAULT_SPEC = `# Please begin editing or drag and drop your file into this area to upload.
+openapi: 3.0.0
+info:
+  title: Sample API
+  version: 1.0.0
+paths: {}`;
+
 const App: React.FC = () => {
-  const [spec, setSpec] = useState<string>(
-    "# Please begin editing or drag and drop your file into this area to upload.\n\nopenapi: 3.0.0\ninfo:\n  title: Sample API\n  version: 1.0.0\npaths: {}"
-  );
+  const [spec, setSpec] = useState<string>(DEFAULT_SPEC);
   const [yamlError, setYamlError] = useState<string | null>(null);
   const [openApiErrors, setOpenApiErrors] = useState<OpenApiError[]>([]);
   const [parsedSpec, setParsedSpec] = useState<any | null>(null);
@@ -32,15 +44,8 @@ const App: React.FC = () => {
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  const addInfo = React.useCallback(createAddInfoHandler(setSpec), [setSpec]);
-  const addPath = React.useCallback(createAddPathsHandler(setSpec), [setSpec]);
-
-  const STORAGE_KEYS = {
-    SPEC: "spec",
-    THEME: "theme",
-    YAML_ERROR: "yamlError",
-    OPENAPI_ERRORS: "openApiErrors",
-  };
+  const addInfo = useCallback(createAddInfoHandler(setSpec), [setSpec]);
+  const addPath = useCallback(createAddPathsHandler(setSpec), [setSpec]);
 
   useEffect(() => {
     const loadPersistedState = async () => {
@@ -58,14 +63,17 @@ const App: React.FC = () => {
     loadPersistedState();
   }, []);
 
-  const jumpToLine = (line: number) => {
-    const editor = editorRef.current;
-    if (editor) {
-      editor.revealLineInCenter(line);
-      editor.setPosition({ lineNumber: line, column: 1 });
-      editor.focus();
-    }
-  };
+  const jumpToLine = useCallback(
+    (line: number) => {
+      const editor = editorRef.current;
+      if (editor) {
+        editor.revealLineInCenter(line);
+        editor.setPosition({ lineNumber: line, column: 1 });
+        editor.focus();
+      }
+    },
+    [editorRef]
+  );
 
   const debouncedSave = useCallback(
     debounce(async (spec, yamlError, openApiErrors, theme) => {
@@ -86,7 +94,6 @@ const App: React.FC = () => {
       setOpenApiErrors([]);
       return;
     }
-
     validateOpenAPI(spec, setOpenApiErrors);
   }, [spec, yamlError]);
 
@@ -94,21 +101,26 @@ const App: React.FC = () => {
     const timeout = setTimeout(() => {
       parseDocumentForPreview(spec, setParsedSpec);
     }, 300);
-
     return () => clearTimeout(timeout);
   }, [spec]);
 
-  const clearEditor = () => {
+  const clearEditor = useCallback(() => {
     if (
       window.confirm(
         "Are you sure you want to clear the editor? Unsaved changes will be lost."
       )
     ) {
-      setSpec("# Drag and drop your file into this area to upload or use any of the options above.");
+      setSpec(
+        "# Drag and drop your file into this area to upload or use any of the options above."
+      );
       setYamlError(null);
       setOpenApiErrors([]);
     }
-  };
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((t) => (t === "light" ? "dark" : "light"));
+  }, []);
 
   return (
     <>
@@ -160,9 +172,7 @@ const App: React.FC = () => {
           importFromFile={(e) => importFromFile(e, setSpec)}
           addInfo={addInfo}
           addPath={addPath}
-          toggleTheme={() =>
-            setTheme((prev) => (prev === "light" ? "dark" : "light"))
-          }
+          toggleTheme={toggleTheme}
           clearEditor={clearEditor}
           theme={theme}
         />

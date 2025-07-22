@@ -1,6 +1,8 @@
 # swagrLite ⚡
 
-A lightweight Swagger Editor–like app built with **React**, **TypeScript**, and **Vite**, designed for easy OpenAPI YAML editing and validation.
+A lightweight Swagger Editor–like app built with **React**, **TypeScript**, and **Vite**, designed for easy OpenAPI YAML editing and validation. 
+
+Also, because editor.swagger.io decided to put a price tag on some of the cool stuff below. Yay, paywalls!
 
 [Click here to try it out!](https://deyrupak.github.io/swagrLite/)
 
@@ -24,7 +26,6 @@ A lightweight Swagger Editor–like app built with **React**, **TypeScript**, an
 
 ### Prerequisites
 - Node.js ≥ 20.19.4  
-- npm or yarn
 
 
 ### Installation

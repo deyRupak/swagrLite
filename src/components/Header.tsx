@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface HeaderProps {
   spec: string;
   downloadSpec: (spec: string, format: "yaml" | "json") => void;
@@ -103,4 +105,4 @@ const Header: React.FC<HeaderProps> = ({
   );
 };
 
-export default Header;
+export default memo(Header);
