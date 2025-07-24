@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { Helmet } from "react-helmet";
 import Split from "react-split";
 import * as monaco from "monaco-editor";
@@ -16,7 +22,12 @@ import {
 } from "./utils/fileHandler";
 import { createAddInfoHandler } from "./utils/infoSnippetHandler";
 import { createAddPathsHandler } from "./utils/pathSnippetHandler";
-import { validateOpenAPI, parseDocumentForPreview } from "./utils/yamlUtils";
+import {
+  validateOpenAPI,
+  parseDocumentForPreview,
+  convertSpecFormat,
+  isJSON,
+} from "./utils/yamlUtils";
 import "./App.css";
 
 type OpenApiError = { message: string; line?: number };
@@ -118,6 +129,21 @@ const App: React.FC = () => {
     }
   }, []);
 
+  const handleConvertSpecFormat = () => {
+    try {
+      const newSpec = convertSpecFormat(spec);
+      setSpec(newSpec);
+      setYamlError(null);
+    } catch (err: any) {
+      console.error("Format conversion failed:", err.message);
+      setYamlError("Format conversion failed: " + err.message);
+    }
+  };
+
+  const nextFormat = useMemo<"YAML" | "JSON">(() => {
+    return isJSON(spec) ? "YAML" : "JSON";
+  }, [spec]);
+
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "light" ? "dark" : "light"));
   }, []);
@@ -168,6 +194,8 @@ const App: React.FC = () => {
         <Header
           spec={spec}
           downloadSpec={downloadSpec}
+          convertSpecFormat={handleConvertSpecFormat}
+          nextFormat={nextFormat}
           importFromUrl={() => importFromUrl(setSpec)}
           importFromFile={(e) => importFromFile(e, setSpec)}
           addInfo={addInfo}

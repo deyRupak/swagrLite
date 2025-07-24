@@ -1,4 +1,4 @@
-import yaml from 'yaml';
+import yaml from "yaml";
 import OpenAPISchemaValidator from "openapi-schema-validator";
 
 type OpenApiError = { message: string; line?: number };
@@ -11,7 +11,8 @@ export function getLineFromOffset(text: string, offset: number): number {
 
 // Parse YAML and validate with OpenAPI Schema Validator
 export function validateOpenAPI(
-    spec: string, setOpenApiErrors: React.Dispatch<React.SetStateAction<OpenApiError[]>>
+  spec: string,
+  setOpenApiErrors: React.Dispatch<React.SetStateAction<OpenApiError[]>>
 ) {
   if (spec.trim() === "") return;
 
@@ -23,8 +24,13 @@ export function validateOpenAPI(
     if (result.errors.length > 0) {
       const errors: OpenApiError[] = result.errors.map((err) => {
         const path = err.instancePath?.split("/").filter(Boolean) || [];
-        const node = path.reduce((acc: any, key: string) => acc?.get?.(key), doc);
-        const pos = node?.range ? getLineFromOffset(spec, node.range[0]) : undefined;
+        const node = path.reduce(
+          (acc: any, key: string) => acc?.get?.(key),
+          doc
+        );
+        const pos = node?.range
+          ? getLineFromOffset(spec, node.range[0])
+          : undefined;
 
         return {
           message: err.message ?? "Unknown error",
@@ -37,12 +43,17 @@ export function validateOpenAPI(
       setOpenApiErrors([]);
     }
   } catch (err: any) {
-    setOpenApiErrors([{ message: "OpenAPI validation failed: " + err.message }]);
+    setOpenApiErrors([
+      { message: "OpenAPI validation failed: " + err.message },
+    ]);
   }
 }
 
 // Parse document for preview or further processing
-export function parseDocumentForPreview(spec: string, setParsedSpec: React.Dispatch<React.SetStateAction<any | null>>) {
+export function parseDocumentForPreview(
+  spec: string,
+  setParsedSpec: React.Dispatch<React.SetStateAction<any | null>>
+) {
   try {
     const doc = yaml.parse(spec);
     setParsedSpec(doc);
@@ -50,3 +61,26 @@ export function parseDocumentForPreview(spec: string, setParsedSpec: React.Dispa
     setParsedSpec(null);
   }
 }
+
+export const isJSON = (text: string): boolean => {
+  try {
+    JSON.parse(text);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const yamlToJson = (yamlStr: string): string => {
+  const parsed = yaml.parse(yamlStr);
+  return JSON.stringify(parsed, null, 2);
+};
+
+export const jsonToYaml = (jsonStr: string): string => {
+  const parsed = JSON.parse(jsonStr);
+  return yaml.stringify(parsed);
+};
+
+export const convertSpecFormat = (spec: string): string => {
+  return isJSON(spec) ? jsonToYaml(spec) : yamlToJson(spec);
+};

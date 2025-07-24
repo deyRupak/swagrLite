@@ -3,6 +3,8 @@ import { memo } from "react";
 interface HeaderProps {
   spec: string;
   downloadSpec: (spec: string, format: "yaml" | "json") => void;
+  convertSpecFormat: () => void;
+  nextFormat: "YAML" | "JSON";
   importFromUrl: () => void;
   importFromFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
   addInfo: () => void;
@@ -15,6 +17,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   spec,
   downloadSpec,
+  convertSpecFormat,
+  nextFormat,
   importFromUrl,
   importFromFile,
   addInfo,
@@ -35,7 +39,6 @@ const Header: React.FC<HeaderProps> = ({
       }}
     >
       <div>
-
         {/*  */}
         <button
           className="button"
@@ -69,12 +72,19 @@ const Header: React.FC<HeaderProps> = ({
         <label htmlFor="fileInput" className="button">
           Import File
         </label>
+        <button className="button" onClick={convertSpecFormat}>
+          Convert to {nextFormat}
+        </button>
 
         {/*  */}
         <button
           className="button"
           onClick={addInfo}
-          style={{ marginLeft: "2rem", backgroundColor: "#2a7ae8", color: "#fff" }}
+          style={{
+            marginLeft: "2rem",
+            backgroundColor: "#2a7ae8",
+            color: "#fff",
+          }}
           title="Add Info"
         >
           Add Info
@@ -89,13 +99,24 @@ const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/*  */}
-        <button className="button" style={{ marginLeft: "2rem" }} onClick={toggleTheme}>
+        <button
+          className="button"
+          style={{ marginLeft: "2rem" }}
+          onClick={toggleTheme}
+        >
           Toggle {theme === "dark" ? "Light" : "Dark"} Mode
         </button>
-        <button className="button" style={{ backgroundColor: "#e82a3a", color: "#fff", marginLeft: "2rem" }} onClick={clearEditor}>
+        <button
+          className="button"
+          style={{
+            backgroundColor: "#e82a3a",
+            color: "#fff",
+            marginLeft: "2rem",
+          }}
+          onClick={clearEditor}
+        >
           Clear Editor
         </button>
-
       </div>
 
       <p style={{ fontSize: "1.2rem", fontWeight: "bolder", color: "#38d120" }}>
