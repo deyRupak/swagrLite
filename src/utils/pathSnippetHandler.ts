@@ -1,3 +1,6 @@
+import { isJSON } from './yamlUtils'; 
+import yaml from 'yaml';
+
 export const pathsSnippet = `paths:
   /example/{exampleId}:
     get:
@@ -26,6 +29,9 @@ export const pathsSnippet = `paths:
                 $ref: '#/components/schemas/Example'
 `;
 
+// parse pathsSnippet YAML once to JS object
+const pathsObject = yaml.parse(pathsSnippet).paths;
+
 function findBlockEnd(lines: string[], startIndex: number): number {
   const startIndent = lines[startIndex].search(/\S/);
   let i = startIndex + 1;
@@ -46,43 +52,60 @@ function findBlockEnd(lines: string[], startIndex: number): number {
 
 // if 'paths' exists, replaces it; otherwise, inserts after 'info:' section or 'openapi:' if 'info:' not found
 export function addOrReplacePathsInSpec(currentSpec: string): string {
-  const lines = currentSpec.split("\n");
-
-  const pathsIndex = lines.findIndex((line) =>
-    line.trim().startsWith("paths:")
-  );
-  const infoIndex = lines.findIndex((line) => line.trim().startsWith("info:"));
-  const openapiIndex = lines.findIndex((line) =>
-    line.trim().startsWith("openapi:")
-  );
-
-  if (pathsIndex !== -1) {
-    // remove existing paths block
-    let endIndex = pathsIndex + 1;
-    while (
-      endIndex < lines.length &&
-      (lines[endIndex].startsWith(" ") || lines[endIndex].startsWith("\t"))
-    ) {
-      endIndex++;
+  if (isJSON(currentSpec)) {
+    try {
+      const specObj = JSON.parse(currentSpec);
+      specObj.paths = pathsObject;
+      return JSON.stringify(specObj, null, 2);
+    } catch {
+      // fallback to original
+      return currentSpec;
     }
-    lines.splice(
-      pathsIndex,
-      endIndex - pathsIndex,
-      ...pathsSnippet.split("\n")
-    );
-    return lines.join("\n");
   } else {
-    // insert paths snippet after end of 'info:' block, or after 'openapi:', or prepend
-    if (infoIndex !== -1) {
-      const infoEndIndex = findBlockEnd(lines, infoIndex);
-      lines.splice(infoEndIndex + 1, 0, ...pathsSnippet.split("\n"));
-      return lines.join("\n");
-    } else if (openapiIndex !== -1) {
-      lines.splice(openapiIndex + 1, 0, ...pathsSnippet.split("\n"));
-      return lines.join("\n");
-    } else {
-      // no 'info:' or 'openapi:' found, prepend the paths
-      return `${pathsSnippet}\n${currentSpec}`;
+    try {
+      const specObj = yaml.parse(currentSpec);
+      specObj.paths = pathsObject;
+      return yaml.stringify(specObj);
+    } catch {
+      // fallback to original line-based approach
+      const lines = currentSpec.split("\n");
+      const pathsIndex = lines.findIndex((line) =>
+        line.trim().startsWith("paths:")
+      );
+      const infoIndex = lines.findIndex((line) => line.trim().startsWith("info:"));
+      const openapiIndex = lines.findIndex((line) =>
+        line.trim().startsWith("openapi:")
+      );
+
+      if (pathsIndex !== -1) {
+        // remove existing paths block
+        let endIndex = pathsIndex + 1;
+        while (
+          endIndex < lines.length &&
+          (lines[endIndex].startsWith(" ") || lines[endIndex].startsWith("\t"))
+        ) {
+          endIndex++;
+        }
+        lines.splice(
+          pathsIndex,
+          endIndex - pathsIndex,
+          ...pathsSnippet.split("\n")
+        );
+        return lines.join("\n");
+      } else {
+        // insert paths snippet after end of 'info:' block, or after 'openapi:', or prepend
+        if (infoIndex !== -1) {
+          const infoEndIndex = findBlockEnd(lines, infoIndex);
+          lines.splice(infoEndIndex + 1, 0, ...pathsSnippet.split("\n"));
+          return lines.join("\n");
+        } else if (openapiIndex !== -1) {
+          lines.splice(openapiIndex + 1, 0, ...pathsSnippet.split("\n"));
+          return lines.join("\n");
+        } else {
+          // no 'info:' or 'openapi:' found, prepend the paths
+          return `${pathsSnippet}\n${currentSpec}`;
+        }
+      }
     }
   }
 }
